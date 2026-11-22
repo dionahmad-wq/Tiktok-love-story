@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Rendert Folge 1 von „30 TAGE“ als TikTok-Video (1080x1920, 30 fps, mit Musik).
+"""„30 TAGE“-Stil: Render-Engine für alle Folgen (1080x1920, 30 fps).
 
-Aufruf:  python3 video/render_folge01.py
-Ergebnis: video/folge01_30tage.mp4
-Benötigt: ffmpeg, Pillow, numpy, Inter- und Noto-Color-Emoji-Schrift.
+Jede Folge ist eine eigene Datei (z. B. folge01.py), die nur ihr Drehbuch
+definiert und `render(build_scenes, teil, out)` aufruft. Siehe serie/04_stil.md.
+
+TON-REGEL: KEINE Musikinstrumente. Nur Atmo (Regen, Raumton, Wind, Stille)
+und Soundeffekte (Übergangs-Whoosh, Bass-Schlag, Herzschlag, Nachrichtenton).
 """
 import math
 import os
@@ -21,7 +23,6 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 W, H, FPS = 1080, 1920, 30
 BW, BH = 1188, 2112  # Hintergrund etwas größer für langsamen Zoom
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(OUT_DIR, "folge01_30tage.mp4")
 FONT_DIR = "/usr/share/fonts/opentype/inter/"
 EMOJI_FONT = "/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf"
 
@@ -134,9 +135,9 @@ def speaker(name, text, color, name_color=None):
     ])
 
 
-def badge():
+def badge(teil):
     f = F("Inter-ExtraBold.otf", 32)
-    label = "30 TAGE  ·  TEIL 1"
+    label = f"30 TAGE  ·  TEIL {teil}"
     tw = f.getlength(label)
     im = Image.new("RGBA", (W, 90), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -465,51 +466,19 @@ def _fade(im, k):
     return out
 
 
-# ---------------------------------------------------------------- Drehbuch Folge 1
-def build_scenes():
-    return [
-        dict(bg="rain", dur=4.4, fx="rain", items=[
-            (0.0, render_block([("Er hatte 30 Tage, um mich in sich verliebt zu machen.", F("Inter-ExtraBold.otf", 76), WHITE, 0)])),
-            (1.7, narr("Ich wusste es nicht.", 70, PINK, "Inter-ExtraBold.otf"))]),
-        dict(bg="hallway", dur=4.6, fx="dust_cool", items=[
-            (0.25, narr("Montag. 7:52 Uhr.", 72, WHITE, "Inter-ExtraBold.otf")),
-            (1.4, narr("Der Tag, an dem alles angefangen hat.", 60))]),
-        dict(bg="door", dur=5.4, fx="dust", items=[
-            (0.2, narr("Jeder kannte ihn.", 62)),
-            (1.2, narr("Noah.", 120, NOAH_C, "Inter-Black.otf")),
-            (2.4, narr("Sitzengeblieben. Schlägerei-Gerüchte. Lederjacke.", 54, (230, 230, 235), "Inter-SemiBold.otf"))]),
-        dict(bg="classroom", dur=3.8, fx="dust", items=[
-            (0.3, speaker("Lehrerin", "Noah, setz dich neben Lina.", TEACH_C))]),
-        dict(bg="classroom", dur=7.0, fx="dust", items=[
-            (0.3, speaker("Noah", "Lina also. Lächelst du auch mal?", NOAH_C)),
-            (3.1, speaker("Lina", "Nur bei Leuten, die mich nicht nerven.", LINA_C, PINK))]),
-        dict(bg="classroom_cool", dur=3.9, fx="dust_cool", items=[
-            (0.3, speaker("Noah", "Dann hab ich ja 'ne Challenge.", NOAH_C))]),
-        dict(bg="yard", dur=5.8, fx="dust_cool", items=[
-            (0.3, narr("Ich hab nicht verstanden, warum seine Jungs die ganze Pause zu mir rübergeschaut haben.", 58))]),
-        dict(bg="black_red", dur=3.0, fx=None, items=[
-            (0.5, narr("Heute weiß ich's.", 92, WHITE, "Inter-Black.otf"))], boom=0.5),
-        dict(bg="black", dur=2.4, fx=None, badge=False, items=[
-            (0.2, narr("Am selben Abend.", 52, (190, 190, 200), "Inter-SemiBold.otf")),
-            (0.9, narr("Noahs Handy.", 72, NOAH_C, "Inter-ExtraBold.otf"))]),
-        dict(chat=True, dur=11.8, msgs=[
-            dict(**{"from": "Luca"}, text="Tag 1 von 30. Die Uhr läuft, Bruder 😂💸", typing=0.5, t=1.5),
-            dict(**{"from": "Du"}, text="Chill. Sie hat schon geredet.", typing=None, t=3.4),
-            dict(**{"from": "Emre"}, text="Ich find das immer noch lost ey…", typing=4.3, t=5.6),
-            dict(**{"from": "Luca"}, text="Noch 29 Tage. Dann will ich sehen, wie sie heult 😂", typing=6.6, t=7.8),
-        ], end_t=9.8),
-    ]
 
 
 SCENES = None
 BADGE = None
 GRAIN = None
+BUILD = None
+TEIL = 1
 
 
 def init_worker():
     global SCENES, BADGE, GRAIN
-    SCENES = build_scenes()
-    BADGE = badge()
+    SCENES = BUILD()
+    BADGE = badge(TEIL)
     rng = np.random.default_rng(5)
     GRAIN = []
     for _ in range(6):
@@ -580,96 +549,132 @@ def render_scene(idx):
     return path
 
 
-# ---------------------------------------------------------------- Musik (selbst komponiert, lizenzfrei)
+# ---------------------------------------------------------------- Ton (KEINE Musikinstrumente!)
+# Nur Atmo + Soundeffekte. Pro Szene steuerbar über:
+#   amb="rain" | "room" | "outdoor" | "night" | "phone" | "silence"
+#   boom=<sek>              dumpfer Bass-Schlag (Dramamoment)
+#   heartbeat=(<sek>, <n>)  Herzschlag, n Schläge
+# Automatisch: leiser Whoosh bei jedem Szenenwechsel, Nachrichtenton bei Chat-Nachrichten.
+SR = 44100
+AMB_DEFAULT = {"rain": "rain", "hallway": "room", "door": "room", "classroom": "room",
+               "classroom_cool": "room", "yard": "outdoor", "black": "silence", "black_red": "silence"}
+
+
+def _shaped_noise(rng, n, lo, hi):
+    spec = np.fft.rfft(rng.standard_normal(n))
+    fr = np.fft.rfftfreq(n, 1 / SR)
+    spec *= (fr > lo) / (1 + (fr / hi) ** 2)
+    x = np.fft.irfft(spec, n)
+    return x / (np.max(np.abs(x)) + 1e-9)
+
+
+def _ambience(kind, n, rng):
+    t = np.arange(n) / SR
+    if kind == "rain":
+        base = _shaped_noise(rng, n, 150, 2200) * 0.20
+        drops = np.zeros(n)
+        for i in rng.integers(0, n, int(n / SR * 35)):
+            L = min(400, n - i)
+            drops[i:i + L] += rng.uniform(0.1, 0.35) * np.exp(-np.arange(L) / 60) * rng.standard_normal(L)
+        return base + drops * 0.25
+    if kind == "room":
+        return _shaped_noise(rng, n, 40, 350) * 0.10
+    if kind == "outdoor":
+        wind = _shaped_noise(rng, n, 60, 600) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.23 * t + 1))
+        return wind * 0.13
+    if kind == "night":
+        return _shaped_noise(rng, n, 30, 250) * 0.07
+    if kind == "phone":
+        return _shaped_noise(rng, n, 40, 300) * 0.06
+    return _shaped_noise(rng, n, 30, 200) * 0.025  # silence = fast nichts
+
+
+def _whoosh(rng):
+    L = int(0.45 * SR)
+    x = _shaped_noise(rng, L, 300, 3000)
+    env = np.sin(np.linspace(0, np.pi, L)) ** 2
+    return x * env * 0.09
+
+
+def _boom(rng):
+    L = int(2.2 * SR)
+    tt = np.arange(L) / SR
+    b = np.sin(2 * np.pi * np.cumsum(np.linspace(75, 32, L)) / SR) * np.exp(-tt * 2.2) * 0.38
+    return b + _shaped_noise(rng, L, 20, 200) * np.exp(-tt * 8) * 0.2
+
+
+def _heartbeat():
+    L = int(0.9 * SR)
+    tt = np.arange(L) / SR
+    def thump(t0, amp):
+        x = np.clip(tt - t0, 0, None)
+        return amp * np.sin(2 * np.pi * 52 * x) * np.exp(-x * 22) * (tt >= t0)
+    return thump(0, 0.42) + thump(0.24, 0.3)
+
+
+def _pling():
+    L = int(0.3 * SR)
+    tt = np.arange(L) / SR
+    return (np.sin(2 * np.pi * 1568 * tt) * (tt < 0.09) + np.sin(2 * np.pi * 2093 * tt) * (tt >= 0.07)) * np.exp(-tt * 14) * 0.22
+
+
 def make_audio(path, scenes):
-    sr = 44100
+    rng = np.random.default_rng(2)
     starts, acc = [], 0.0
     for sc in scenes:
         starts.append(acc)
         acc += round(sc["dur"] * FPS) / FPS
     total = acc
-    n = int((total + 0.2) * sr)
-    music = np.zeros(n)
-    midi = lambda m: 440 * 2 ** ((m - 69) / 12)
+    n = int((total + 0.2) * SR)
+    out = np.zeros(n)
+    xf = int(0.3 * SR)  # Überblendung der Atmo zwischen Szenen
 
-    def note(m, start, dur=2.6, vel=0.22):
-        i0 = int(start * sr)
-        if i0 >= n:
-            return
-        L = min(int(dur * sr), n - i0)
-        tt = np.arange(L) / sr
-        f = midi(m)
-        sig = sum(a * np.sin(2 * np.pi * f * k * tt) * np.exp(-tt * k * 0.9) for k, a in ((1, 1), (2, .4), (3, .15), (4, .06)))
-        music[i0:i0 + L] += vel * sig * np.exp(-tt * 1.8) * np.minimum(1, tt / 0.005)
+    def add(sig, t0, gain=1.0):
+        i0 = int(t0 * SR)
+        if 0 <= i0 < n:
+            L = min(len(sig), n - i0)
+            out[i0:i0 + L] += sig[:L] * gain
 
-    beat = 60 / 74
-    prog = [(57, [69, 72, 76]), (53, [65, 69, 72]), (48, [64, 67, 72]), (55, [67, 71, 74])]
-    pat = [0, 1, 2, 1, 0, 2, 1, 2]
-    melody = [81, 79, 76, 79, 77, 76, 72, 74]
-    bar = 0
-    while bar * 4 * beat < total:
-        root, ch = prog[bar % 4]
-        t0 = bar * 4 * beat
-        note(root - 12, t0, 4.5, 0.32)
-        note(root, t0, 4.0, 0.14)
-        for i, pi in enumerate(pat):
-            note(ch[pi], t0 + i * beat / 2, 1.8, 0.11 + (0.03 if i == 0 else 0))
-        if bar >= 2:
-            note(melody[bar % 8], t0 + beat * 0.02, 3.0, 0.13)
-            if bar % 2:
-                note(melody[(bar + 3) % 8], t0 + beat * 2.5, 2.0, 0.09)
-        bar += 1
-    # Hall
-    ir_len = int(2.2 * sr)
-    rng = np.random.default_rng(2)
-    ir = rng.standard_normal(ir_len) * np.exp(-np.arange(ir_len) / sr * 2.6)
-    ir /= np.sqrt(np.sum(ir ** 2))
-    N = 1 << int(np.ceil(np.log2(n + ir_len)))
-    wet = np.fft.irfft(np.fft.rfft(music, N) * np.fft.rfft(ir, N), N)[:n]
-    music = music * 0.75 + wet * 0.35
-    # Lautstärke-Kurve: ducken bei „Heute weiß ich's“
-    t = np.arange(n) / sr
-    vol = np.ones(n)
-    d0, d1 = starts[7], starts[9]
-    vol = np.where((t > d0) & (t < d1), 0.18, vol)
-    vol = np.convolve(vol, np.ones(int(0.35 * sr)) / int(0.35 * sr), mode="same")
-    vol *= np.clip((total - t) / 1.4, 0, 1)
-    music *= vol
-    # Regen
-    noise = rng.standard_normal(n)
-    spec = np.fft.rfft(noise)
-    fr = np.fft.rfftfreq(n, 1 / sr)
-    rain = np.fft.irfft(spec / (1 + (fr / 1500) ** 2) * (fr > 120), n)
-    rain /= np.max(np.abs(rain))
-    rv = np.where(t < starts[1], 0.16, 0.045) * np.clip((total - t) / 1.4, 0, 1)
-    rv = np.convolve(rv, np.ones(int(0.5 * sr)) / int(0.5 * sr), mode="same")
-    out = music + rain * rv
-    # Boom
-    b0 = int((starts[7] + scenes[7]["boom"]) * sr)
-    L = int(2.2 * sr)
-    tt = np.arange(L) / sr
-    boom = np.sin(2 * np.pi * np.cumsum(np.linspace(75, 32, L)) / sr) * np.exp(-tt * 2.2) * 0.9
-    boom += np.fft.irfft(np.fft.rfft(rng.standard_normal(L)) / (1 + (np.fft.rfftfreq(L, 1 / sr) / 200) ** 2), L) * np.exp(-tt * 8) * 0.15
-    out[b0:b0 + L] += boom[: max(0, min(L, n - b0))]
-    # Nachrichten-Töne
-    for m in scenes[9]["msgs"]:
-        i0 = int((starts[9] + m["t"]) * sr)
-        L = int(0.3 * sr)
-        tt = np.arange(L) / sr
-        tone = (np.sin(2 * np.pi * 1568 * tt) * (tt < 0.09) + np.sin(2 * np.pi * 2093 * tt) * (tt >= 0.07)) * np.exp(-tt * 14)
-        out[i0:i0 + L] += 0.22 * tone[: max(0, min(L, n - i0))]
+    for i, sc in enumerate(scenes):
+        kind = sc.get("amb") or ("phone" if sc.get("chat") else AMB_DEFAULT.get(sc.get("bg"), "room"))
+        i0 = max(0, int(starts[i] * SR) - xf // 2)
+        i1 = min(n, int((starts[i] + sc["dur"]) * SR) + xf // 2)
+        L = i1 - i0
+        a = _ambience(kind, L, rng)
+        env = np.ones(L)
+        r = min(xf, L // 2)
+        env[:r] = np.linspace(0, 1, r) if i > 0 else 1
+        env[-r:] = np.linspace(1, 0, r)
+        out[i0:i1] += a * env
+        if i > 0:
+            add(_whoosh(rng), starts[i] - 0.25)
+        if sc.get("boom") is not None:
+            add(_boom(rng), starts[i] + sc["boom"])
+        if sc.get("heartbeat"):
+            t0, k = sc["heartbeat"]
+            for j in range(k):
+                add(_heartbeat(), starts[i] + t0 + j * 0.85)
+        for m in sc.get("msgs", []):
+            add(_pling(), starts[i] + m["t"])
+    t = np.arange(n) / SR
+    out *= np.clip((total - t) / 1.2, 0, 1)
     out = out / np.max(np.abs(out)) * 0.89
     pcm = (np.repeat(out[:, None], 2, axis=1) * 32767).astype(np.int16)
     with wave.open(path, "wb") as wf:
         wf.setnchannels(2)
         wf.setsampwidth(2)
-        wf.setframerate(sr)
+        wf.setframerate(SR)
         wf.writeframes(pcm.tobytes())
 
 
-TMP = tempfile.mkdtemp(prefix="folge01_")
+# ---------------------------------------------------------------- Rendern
+TMP = tempfile.mkdtemp(prefix="30tage_")
 
-if __name__ == "__main__":
+
+def render(build_scenes, teil, out):
+    """Rendert eine Folge im 30-TAGE-Stil nach `out` (MP4, TikTok-fertig)."""
+    global BUILD, TEIL
+    BUILD, TEIL = build_scenes, teil
     init_worker()
     with Pool(os.cpu_count() or 2, initializer=init_worker) as pool:
         segs = pool.map(render_scene, range(len(SCENES)), chunksize=1)
@@ -678,6 +683,11 @@ if __name__ == "__main__":
     lst = os.path.join(TMP, "list.txt")
     with open(lst, "w") as f:
         f.writelines(f"file '{s}'\n" for s in segs)
+    raw = os.path.join(TMP, "raw.mp4")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-i", audio,
-                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", OUT], check=True)
-    print("Fertig:", OUT)
+                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", raw], check=True)
+    # finale Kompression: TikTok-taugliche Bitrate, Datei < 60 MB
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-c:v", "libx264", "-preset", "slow",
+                    "-crf", "21", "-maxrate", "9M", "-bufsize", "18M", "-pix_fmt", "yuv420p", "-c:a", "copy",
+                    "-movflags", "+faststart", out], check=True)
+    print("Fertig:", out)

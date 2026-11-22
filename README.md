@@ -9,6 +9,7 @@ Eine fertige TikTok-Serie im deutschen Jugendlichen-Stil: Teen-Romance, Drama, C
 |---|---|
 | [`serie/01_charaktere.md`](serie/01_charaktere.md) | Alle 8 Figuren mit Look, Background, Geheimnissen und typischen Sätzen |
 | [`serie/02_staffel1_folgen.md`](serie/02_staffel1_folgen.md) | Staffel 1: 12 Folgen mit Hook, Szenen, Dialogen, Cliffhanger und Caption |
+| [`serie/04_stil.md`](serie/04_stil.md) | Der feste Video-Stil: Aufbau, Optik, Farben, Ton (ohne Instrumente) |
 | [`serie/03_produktion_und_wachstum.md`](serie/03_produktion_und_wachstum.md) | Videoproduktion (CapCut / KI-Bilder), Prompts, Posting-Plan, Hashtags, Follower-Tricks, Ideen für Staffel 2 |
 
 ## ⚡ Schnellstart
@@ -20,5 +21,6 @@ Eine fertige TikTok-Serie im deutschen Jugendlichen-Stil: Teen-Romance, Drama, C
 *Alle Figuren und Ereignisse sind frei erfunden.*
 
 ## 🎬 Fertiges Video
-- **Folge 1:** [`video/folge01_30tage.mp4`](video/folge01_30tage.mp4) (1080×1920, 52 s, mit eigener lizenzfreier Musik)
-- Neu rendern: `python3 video/render_folge01.py` (braucht ffmpeg, Pillow, numpy)
+- **Folge 1:** [`video/folge01_30tage.mp4`](video/folge01_30tage.mp4) (1080×1920, 52 s, Atmo und Soundeffekte, keine Instrumente)
+- Neu rendern: `python3 video/folge01.py` (braucht ffmpeg, Pillow, numpy)
+- Neue Folge: siehe [`serie/04_stil.md`](serie/04_stil.md), Abschnitt 5
