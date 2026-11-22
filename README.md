@@ -18,3 +18,7 @@ Eine fertige TikTok-Serie im deutschen Jugendlichen-Stil: Teen-Romance, Drama, C
 4. Jeden Tag eine weitere Folge
 
 *Alle Figuren und Ereignisse sind frei erfunden.*
+
+## 🎬 Fertiges Video
+- **Folge 1:** [`video/folge01_30tage.mp4`](video/folge01_30tage.mp4) (1080×1920, 52 s, mit eigener lizenzfreier Musik)
+- Neu rendern: `python3 video/render_folge01.py` (braucht ffmpeg, Pillow, numpy)
