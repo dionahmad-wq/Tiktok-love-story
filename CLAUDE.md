@@ -3,6 +3,7 @@
 ## Feste Vorgaben des Nutzers (immer einhalten)
 - **Folge 1 (`video/folge01_30tage.mp4`) ist die perfekte Referenz.** Alle weiteren Videos werden exakt in diesem Stil gemacht. Die Regeln stehen in `serie/04_stil.md`.
 - **KEINE Musikinstrumente im Ton.** Kein Klavier, keine Melodie, keine Beats. Nur Atmo (Regen, Raumton, Wind, Stille) und Soundeffekte (Whoosh, Bass-Schlag, Herzschlag, Nachrichtenton).
+- **Jedes Video endet mit einer CTA „Folge dem Kanal“** und einem „+ Folgen“-Button (ist in `video/stil.py` eingebaut).
 - Alles auf **Deutsch**, im Stil deutscher Jugendlicher, spannend, mit Cliffhanger in jeder Folge.
 - Mit dem Nutzer auf Deutsch kommunizieren.
 

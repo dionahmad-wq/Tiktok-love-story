@@ -33,7 +33,7 @@ def build_scenes():
         dict(bg="black", dur=2.4, fx=None, badge=False, items=[
             (0.2, narr("Am selben Abend.", 52, (190, 190, 200), "Inter-SemiBold.otf")),
             (0.9, narr("Noahs Handy.", 72, NOAH_C, "Inter-ExtraBold.otf"))]),
-        dict(chat=True, dur=11.8, msgs=[
+        dict(chat=True, dur=14.0, msgs=[
             dict(**{"from": "Luca"}, text="Tag 1 von 30. Die Uhr läuft, Bruder 😂💸", typing=0.5, t=1.5),
             dict(**{"from": "Du"}, text="Chill. Sie hat schon geredet.", typing=None, t=3.4),
             dict(**{"from": "Emre"}, text="Ich find das immer noch lost ey…", typing=4.3, t=5.6),

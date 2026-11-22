@@ -13,7 +13,7 @@ Folge 1 ist die Referenz. **Jede neue Folge sieht und klingt genau so.**
 3. **Dramamoment:** kurzer Satz auf Schwarz mit rotem Glühen, dazu Bass-Schlag und Herzschlag
 4. **Überleitung:** „Am selben Abend.“ / „<Name>s Handy.“ auf Schwarz
 5. **Cliffhanger als Chat** (WhatsApp-Dark-Mode) mit „schreibt…“-Anzeige und Nachrichtenton
-6. **Ende:** Abdunkeln, dazu „Teil X folgt…“ und „#30tage 🖤“. Kein „Folgt mir“-Bild.
+6. **Ende mit CTA (immer!):** Der Chat wird unscharf und dunkel, dann erscheint „Teil X+1 folgt…“. 0,8 s später kommt **„Folge dem Kanal, damit du Teil X+1 nicht verpasst 💗“** mit einem pinken, pulsierenden **„+ Folgen“-Button** (Plopp-Geräusch) und einem tippenden 👆. Die CTA steht mindestens 3 Sekunden. Das macht die Engine automatisch, die Chat-Szene muss nur `dur ≈ end_t + 4.2` haben.
 
 ## 3. Optik
 | Element | Regel |
@@ -42,7 +42,7 @@ Dialoge stehen immer so: **NAME** (klein, Großbuchstaben), darunter das Zitat i
 ## 4. Ton: ⚠️ KEINE MUSIKINSTRUMENTE
 Kein Klavier, keine Gitarre, keine Beats, keine Melodien. Erlaubt sind nur:
 - **Atmo** pro Szene: Regen (`rain`), Raumton (`room`), Wind draußen (`outdoor`), Nacht (`night`), Handy-Stille (`phone`), fast Stille (`silence`)
-- **Soundeffekte:** leiser Whoosh beim Szenenwechsel, dumpfer Bass-Schlag (`boom`), Herzschlag (`heartbeat`), Nachrichtenton im Chat
+- **Soundeffekte:** leiser Whoosh beim Szenenwechsel, dumpfer Bass-Schlag (`boom`), Herzschlag (`heartbeat`), Nachrichtenton im Chat, Plopp beim Folgen-Button
 
 Einen Trend-Sound legt der Account-Inhaber selbst in der TikTok-App drüber, falls gewünscht.
 

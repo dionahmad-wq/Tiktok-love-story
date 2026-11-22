@@ -21,6 +21,6 @@ Eine fertige TikTok-Serie im deutschen Jugendlichen-Stil: Teen-Romance, Drama, C
 *Alle Figuren und Ereignisse sind frei erfunden.*
 
 ## 🎬 Fertiges Video
-- **Folge 1:** [`video/folge01_30tage.mp4`](video/folge01_30tage.mp4) (1080×1920, 52 s, Atmo und Soundeffekte, keine Instrumente)
+- **Folge 1:** [`video/folge01_30tage.mp4`](video/folge01_30tage.mp4) (1080×1920, 54 s, Atmo und Soundeffekte, keine Instrumente, CTA „Folge dem Kanal“ am Ende)
 - Neu rendern: `python3 video/folge01.py` (braucht ffmpeg, Pillow, numpy)
 - Neue Folge: siehe [`serie/04_stil.md`](serie/04_stil.md), Abschnitt 5

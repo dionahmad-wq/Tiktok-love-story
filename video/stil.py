@@ -397,8 +397,12 @@ class Chat:
             self.bubbles.append((b, y))
             y += b.height + 30
         self.typing = self.bubble_typing()
-        self.end_block = render_block([("Teil 2 folgt…", F("Inter-ExtraBold.otf", 84), WHITE, 0),
-                                       ("#30tage 🖤", F("Inter-SemiBold.otf", 44), (220, 220, 230), 20)])
+        self.end_block = render_block([(f"Teil {TEIL + 1} folgt…", F("Inter-ExtraBold.otf", 88), WHITE, 0)])
+        self.cta_text = render_block([("Folge dem Kanal,", F("Inter-ExtraBold.otf", 58), WHITE, 0),
+                                      (f"damit du Teil {TEIL + 1} nicht verpasst 💗", F("Inter-Bold.otf", 46),
+                                       (225, 225, 235), 6)])
+        self.cta_button = cta_button()
+        self.pointer = emoji_img("👆", 96)
 
     def bubble(self, who, text):
         own = who == "Du"
@@ -453,9 +457,51 @@ class Chat:
         d.text((264, 252), sub, font=F("Inter-Regular.otf", 30), fill=sub_c)
         if t >= self.end_t:
             p = min(1, (t - self.end_t) / 0.6)
-            img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(185 * p))))
-            img.alpha_composite(_fade(self.end_block, p), (0, int(860 - self.end_block.height / 2 + (1 - p) * 30)))
+            img = img.filter(ImageFilter.GaussianBlur(14 * p))
+            img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(205 * p))))
+            img.alpha_composite(_fade(self.end_block, p), (0, int(600 - self.end_block.height / 2 + (1 - p) * 30)))
+        tc = t - self.end_t - CTA_DELAY
+        if tc >= 0:
+            # Call-to-Action: „Folge dem Kanal“ + pulsierender Folgen-Button + tippender Finger
+            p = min(1, tc / 0.45)
+            e = 1 - (1 - p) ** 3
+            img.alpha_composite(_fade(self.cta_text, e), (0, int(780 + (1 - e) * 30)))
+            pop = 1 + 0.25 * math.sin(min(1, tc / 0.35) * math.pi) * (1 - min(1, tc / 0.35))
+            pulse = pop * (1 + 0.045 * math.sin(max(0, tc - 0.35) * 2 * math.pi * 1.4))
+            b = self.cta_button
+            bw, bh = int(b.width * pulse * e + 1), int(b.height * pulse * e + 1)
+            if bw > 4:
+                bb = _fade(b.resize((bw, bh), Image.LANCZOS), e)
+                img.alpha_composite(bb, (int(W / 2 - bw / 2), int(1110 - bh / 2)))
+            if tc > 0.5:
+                k = min(1, (tc - 0.5) / 0.3)
+                bounce = abs(math.sin((tc - 0.5) * math.pi * 1.4)) * 28
+                img.alpha_composite(_fade(self.pointer, k), (int(W / 2 + 120), int(1185 + bounce)))
         return img
+
+
+CTA_DELAY = 0.8
+CTA_PINK = (254, 44, 85)
+
+
+def cta_button():
+    """TikTok-artiger „+ Folgen“-Button (Pink, abgerundet, mit Glow)."""
+    f = F("Inter-ExtraBold.otf", 60)
+    label = "Folgen"
+    tw = f.getlength(label)
+    bw, bh = int(tw + 230), 130
+    pad = 40
+    im = Image.new("RGBA", (bw + 2 * pad, bh + 2 * pad), (0, 0, 0, 0))
+    glow = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    ImageDraw.Draw(glow).rounded_rectangle((pad, pad, pad + bw, pad + bh), radius=bh // 2, fill=CTA_PINK + (170,))
+    im.alpha_composite(glow.filter(ImageFilter.GaussianBlur(22)))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle((pad, pad, pad + bw, pad + bh), radius=bh // 2, fill=CTA_PINK + (255,))
+    cx, cy = pad + 82, pad + bh // 2
+    d.rectangle((cx - 24, cy - 6, cx + 24, cy + 6), fill=WHITE)
+    d.rectangle((cx - 6, cy - 24, cx + 6, cy + 24), fill=WHITE)
+    d.text((pad + 135, cy - 38), label, font=f, fill=WHITE)
+    return im
 
 
 def _fade(im, k):
@@ -612,6 +658,14 @@ def _heartbeat():
     return thump(0, 0.42) + thump(0.24, 0.3)
 
 
+def _pop(rng):
+    """Kurzer, weicher „Plopp“ wenn der Folgen-Button erscheint (kein Instrument)."""
+    L = int(0.12 * SR)
+    tt = np.arange(L) / SR
+    return (np.sin(2 * np.pi * np.cumsum(np.linspace(420, 160, L)) / SR) * np.exp(-tt * 40) * 0.35
+            + _shaped_noise(rng, L, 500, 4000) * np.exp(-tt * 90) * 0.08)
+
+
 def _pling():
     L = int(0.3 * SR)
     tt = np.arange(L) / SR
@@ -656,6 +710,8 @@ def make_audio(path, scenes):
                 add(_heartbeat(), starts[i] + t0 + j * 0.85)
         for m in sc.get("msgs", []):
             add(_pling(), starts[i] + m["t"])
+        if sc.get("chat"):
+            add(_pop(rng), starts[i] + sc["end_t"] + CTA_DELAY)
     t = np.arange(n) / SR
     out *= np.clip((total - t) / 1.2, 0, 1)
     out = out / np.max(np.abs(out)) * 0.89
