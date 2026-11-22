@@ -1,0 +1,11 @@
+node_modules/
+videos/*/out/
+videos/*/.hyperframes/
+videos/*/assets/gsap.min.js
+# wird von tools/build.mjs neu erzeugt
+videos/*/index.html
+videos/*/hyperframes.json
+videos/*/meta.json
+videos/*/assets/music-*.wav
+videos/*/assets/sfx/
+videos/*/assets/img/*.placeholder.svg

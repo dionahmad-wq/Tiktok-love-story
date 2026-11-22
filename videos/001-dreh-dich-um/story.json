@@ -1,0 +1,173 @@
+{
+  "id": "001-dreh-dich-um",
+  "title": "Dreh dich um",
+  "logline": "Lina hat Emre vor zwei Jahren ziehen lassen und ihm nie die Nachricht geschickt, die alles geändert hätte. Auf der Klassenfahrt nach Hamburg schickt sie sie doch ab.",
+  "caption": "Zwei Jahre zu spät… oder genau richtig? 🥺🤍",
+  "hashtags": ["#kistory", "#fürdich", "#ki", "#lovestory", "#emojistories", "#teil1"],
+
+  "style": "ultra-realistic candid smartphone photo, shot on iPhone 15 Pro, vertical 9:16, natural soft light, shallow depth of field, realistic skin texture with pores, cinematic color, everyday German city setting, no text, no watermark",
+
+  "characters": {
+    "lina": {
+      "name": "Lina",
+      "look": "18-year-old German-Turkish girl, long dark brown wavy hair in a half-up ponytail with face-framing curtain bangs, brown eyes, natural makeup, small gold hoop earrings, thin gold necklace, cream chunky knit cardigan over a beige ribbed top, light-wash wide-leg jeans, white sneakers",
+      "voice": { "id": "EXAVITQu4vr4xnSDxMaL", "stability": 0.4, "similarity_boost": 0.8, "style": 0.35 }
+    },
+    "emre": {
+      "name": "Emre",
+      "look": "19-year-old German-Turkish guy, dark brown curly hair with a low taper fade, light stubble, brown eyes, navy blue zip-up hoodie over a plain white t-shirt, grey baggy jeans, white sneakers, silver watch",
+      "voice": { "id": "TX3LPaxmHKxFdv7VOQHJ", "stability": 0.45, "similarity_boost": 0.8, "style": 0.3 }
+    },
+    "mila": {
+      "name": "Mila",
+      "look": "19-year-old girl with sleek light-blonde high ponytail, light makeup, black cropped puffer jacket, white top, black straight-leg jeans",
+      "voice": { "id": "cgSgspJ2msm6clMCkdW9", "stability": 0.45, "similarity_boost": 0.8, "style": 0.3 }
+    }
+  },
+
+  "chat": {
+    "contact": "Emre",
+    "history": [
+      { "from": "them", "text": "Morgen um 7 fährt mein Bus nach Hamburg.", "time": "12. Juni 2024, 22:41" },
+      { "from": "them", "text": "Sag mir nur, ob ich bleiben soll. Ein Wort reicht." }
+    ],
+    "draft": "Bleib. Bitte. Ich liebe dich."
+  },
+
+  "scenes": [
+    {
+      "id": "s01",
+      "image": { "chars": ["lina"], "prompt": "close-up of Lina lying in bed at night in a dark cozy bedroom, face lit only by the cold blue glow of her phone screen held in both hands, glossy eyes with a single tear, fairy lights blurred in the background, she wears a white tank top instead of the cardigan" },
+      "camera": "push-in", "grade": "night",
+      "beats": [
+        { "say": "lina", "text": "Zwei Jahre.", "tone": "whisper" },
+        { "say": "lina", "text": "Seit zwei Jahren liegt diese Nachricht in meinem Handy.", "tone": "whisper" }
+      ]
+    },
+    {
+      "id": "s02",
+      "phone": { "background": "s01" },
+      "beats": [
+        { "phone": "open", "dur": 2.6 },
+        { "say": "lina", "text": "Ich hab sie nie abgeschickt.", "tone": "whisper", "captions": false }
+      ]
+    },
+    {
+      "id": "s03", "transition": "fade",
+      "image": { "chars": ["emre", "lina"], "prompt": "early morning at a bus stop in a German town, Emre with a black backpack and a big duffel bag stands facing Lina, pleading look, a city bus with open doors arriving behind them, cold overcast light, medium shot" },
+      "camera": "pan-left", "grade": "flashback",
+      "beats": [
+        { "text": "12. JUNI 2024", "dur": 1.4, "style": "date" },
+        { "say": "emre", "text": "Sag einfach, dass ich bleiben soll. Dann bleib ich." }
+      ]
+    },
+    {
+      "id": "s04",
+      "image": { "chars": ["lina"], "prompt": "close-up of Lina at the same bus stop in the early morning, looking down, biting her lip, holding back tears, arms crossed, cold overcast light" },
+      "camera": "push-in", "grade": "flashback",
+      "beats": [
+        { "wait": 0.6 },
+        { "say": "lina", "text": "Steig ein, Emre." }
+      ]
+    },
+    {
+      "id": "s05",
+      "image": { "chars": ["emre"], "prompt": "close-up of Emre standing in the open door of a city bus, looking back with a hurt, heartbroken expression, early morning overcast light" },
+      "camera": "pull-out", "grade": "flashback",
+      "beats": [
+        { "say": "emre", "text": "Okay." },
+        { "wait": 1.0 }
+      ]
+    },
+    {
+      "id": "s06", "transition": "flash",
+      "image": { "chars": ["lina"], "prompt": "wide shot inside a big historic German main train station with a steel and glass roof, Lina with a small backpack on a platform next to a white ICE train, blurred group of classmates with suitcases in the background, daylight" },
+      "camera": "pan-right",
+      "beats": [
+        { "text": "HEUTE", "dur": 1.0, "style": "date" },
+        { "notify": { "app": "WhatsApp", "title": "Klasse 12b 🚆", "text": "Frau Keller: Alle in 10 Min an Gleis 7!" }, "dur": 0.4 },
+        { "say": "lina", "text": "Klassenfahrt. Nach Hamburg." }
+      ]
+    },
+    {
+      "id": "s07",
+      "image": { "chars": ["lina"], "prompt": "close-up of Lina on a train platform holding her phone in front of her chest, taking a deep breath, nervous but determined look, blurred train station background, daylight" },
+      "camera": "push-in",
+      "beats": [
+        { "say": "lina", "text": "Jetzt oder nie." }
+      ]
+    },
+    {
+      "id": "s08",
+      "phone": { "background": "s07" },
+      "beats": [
+        { "phone": "open", "dur": 1.8 },
+        { "phone": "send", "dur": 1.0 },
+        { "phone": "read", "dur": 1.2 },
+        { "phone": "typing", "dur": 1.8 },
+        { "phone": "receive", "text": "Zwei Jahre zu spät, Lina.", "dur": 2.2 }
+      ]
+    },
+    {
+      "id": "s09",
+      "image": { "chars": ["lina"], "prompt": "extreme close-up of Lina on a train platform, eyes filling with tears, heartbroken, looking down at her phone, blurred station background" },
+      "camera": "push-in",
+      "beats": [
+        { "say": "lina", "text": "Ich weiß…", "tone": "whisper" },
+        { "wait": 0.5 }
+      ]
+    },
+    {
+      "id": "s10",
+      "phone": { "background": "s09" },
+      "beats": [
+        { "phone": "typing", "dur": 1.4 },
+        { "phone": "receive", "text": "Oder genau pünktlich.", "dur": 1.6 },
+        { "phone": "receive", "text": "Dreh dich um.", "dur": 2.0 }
+      ]
+    },
+    {
+      "id": "s11", "transition": "flash",
+      "image": { "chars": ["lina", "emre"], "prompt": "over-the-shoulder shot from behind Lina on a train station platform, she is turning around, a few meters away Emre stands holding his phone, smiling softly at her, warm afternoon light through the glass roof" },
+      "camera": "push-in",
+      "beats": [
+        { "wait": 0.8 },
+        { "say": "emre", "text": "Zwei Jahre, Lina? Echt jetzt?" }
+      ]
+    },
+    {
+      "id": "s12",
+      "image": { "chars": ["lina"], "prompt": "close-up of Lina on the train platform, laughing and crying at the same time, hand over her mouth, warm light" },
+      "camera": "push-in",
+      "beats": [
+        { "say": "lina", "text": "Halt die Klappe und komm her." }
+      ]
+    },
+    {
+      "id": "s13",
+      "image": { "chars": ["lina", "emre"], "prompt": "medium shot of Lina and Emre hugging tightly on a train station platform, her face buried in his hoodie, his eyes closed, warm golden light through the glass roof" },
+      "camera": "pull-out", "grade": "warm",
+      "beats": [
+        { "wait": 1.8 }
+      ]
+    },
+    {
+      "id": "s14",
+      "image": { "chars": ["mila", "emre", "lina"], "prompt": "Mila walks up behind Emre and Lina who are still hugging on the train platform, she holds two coffee cups, confused and suspicious look, medium shot focused on Mila" },
+      "camera": "push-in",
+      "beats": [
+        { "say": "mila", "text": "Emre?" },
+        { "say": "mila", "text": "Wer ist das?" }
+      ]
+    },
+    {
+      "id": "s15",
+      "image": { "chars": ["emre"], "prompt": "close-up of Emre on the train platform, caught off guard, eyes wide, uneasy guilty expression, looking over his shoulder" },
+      "camera": "push-in",
+      "beats": [
+        { "wait": 1.2 },
+        { "text": "TEIL 2? 🤍", "dur": 2.6, "style": "end" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "tiktok-love-story-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tts": "NODE_USE_ENV_PROXY=1 node tts.mjs",
+    "images": "NODE_USE_ENV_PROXY=1 node images.mjs",
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "gsap": "3.15.0",
+    "hyperframes": "0.9.81"
+  }
+}
