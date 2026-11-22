@@ -12,13 +12,15 @@ Folge 1 ist die Referenz. **Jede neue Folge sieht und klingt genau so.**
 2. **Story-Szenen:** Erzähltext und Dialoge
 3. **Dramamoment:** kurzer Satz auf Schwarz mit rotem Glühen, dazu Bass-Schlag und Herzschlag
 4. **Überleitung:** „Am selben Abend.“ / „<Name>s Handy.“ auf Schwarz
-5. **Cliffhanger als Chat** (WhatsApp-Dark-Mode) mit „schreibt…“-Anzeige und Nachrichtenton
-6. **Ende mit CTA (immer!):** Der Chat wird unscharf und dunkel, dann erscheint „Teil X+1 folgt…“. 0,8 s später kommt **„Folge dem Kanal, damit du Teil X+1 nicht verpasst 💗“** mit einem pinken, pulsierenden **„+ Folgen“-Button** (Plopp-Geräusch) und einem tippenden 👆. Die CTA steht mindestens 3 Sekunden. Das macht die Engine automatisch, die Chat-Szene muss nur `dur ≈ end_t + 4.2` haben.
+5. **Cliffhanger auf einem Handy-Screen**, entweder
+   - als **Chat** (WhatsApp-Dark-Mode) mit „schreibt…“-Anzeige und Nachrichtenton (`chat=True`), oder
+   - als **Insta-Post** von @mitternachtsgedanken: Das Gedicht erscheint Zeile für Zeile, ein Like kommt als Push-Banner rein, danach die Reaktion als großer Text (`insta=True`)
+6. **Ende mit CTA (immer!):** Der Chat wird unscharf und dunkel, dann erscheint „Teil X+1 folgt…“. 0,8 s später kommt **„Folge dem Kanal, damit du Teil X+1 nicht verpasst 💗“** mit einem pinken, pulsierenden **„+ Folgen“-Button** (Plopp-Geräusch) und einem tippenden 👆. Die CTA steht mindestens 3 Sekunden. Das macht die Engine automatisch, die letzte Szene (Chat oder Insta) muss nur `dur ≈ end_t + 4.2` haben.
 
 ## 3. Optik
 | Element | Regel |
 |---|---|
-| Hintergründe | gezeichnet und stimmungsvoll: `rain`, `hallway`, `door`, `classroom`, `classroom_cool`, `yard`, `black`, `black_red` |
+| Hintergründe | gezeichnet und stimmungsvoll: `rain`, `hallway`, `door`, `classroom`, `classroom_cool`, `yard`, `spaeti`, `spaeti_cool`, `counter`, `black`, `black_red` |
 | Bewegung | langsamer Zoom (7 % pro Szene), Partikel (`rain`, `dust`, `dust_cool`) und Filmkorn |
 | Look | Vignette, dunkle Farbtöne, leichte Unschärfe im Hintergrund |
 | Badge | oben mittig „● 30 TAGE · TEIL X“, außer auf Überleitungen und im Chat |
@@ -32,7 +34,7 @@ Folge 1 ist die Referenz. **Jede neue Folge sieht und klingt genau so.**
 | Erzähltext | Weiß |
 | **Noah** | Hellblau `(140, 200, 255)` |
 | **Lina** | Weiß, Namensschild in Pink `(255, 92, 122)` |
-| Lehrer/Erwachsene | Warmgelb `(255, 214, 150)` |
+| Lehrer/Erwachsene (auch Onkel Murat) | Warmgelb `(255, 214, 150)` |
 | Pointe/Schock | Pink `(255, 92, 122)` |
 | Chat: Luca | Rot `(255, 120, 110)` |
 | Chat: Emre | Grün `(120, 220, 160)` |

@@ -316,10 +316,101 @@ def bg_black(red=False):
     return img
 
 
+def bg_spaeti(cool=False):
+    """Späti bei Nacht: Regale mit bunten Produkten, Neon-Schild, Kühlschrank-Licht, Kassentresen."""
+    rnd = random.Random(11)
+    img = gradient((26, 16, 38), (10, 8, 18)) if not cool else gradient((12, 22, 40), (6, 10, 20))
+    d = ImageDraw.Draw(img)
+    vx, vy = BW / 2, 1050
+    d.polygon([(0, BH), (BW, BH), (vx + 260, vy + 200), (vx - 260, vy + 200)], fill=(30, 26, 36))
+    d.rectangle((vx - 260, vy - 330, vx + 260, vy + 200), fill=(22, 18, 30))
+    for side in (-1, 1):
+        for shelf in range(6):
+            f0 = 0.22 + shelf * 0.12
+            for i in range(14):
+                s0, s1 = 1 - 1 / (1 + i * 0.3), 1 - 1 / (1 + (i + 0.85) * 0.3)
+                def pt(s, f):
+                    x = lerp(0 if side < 0 else BW, vx + side * 260, s)
+                    yt, yb = lerp(0, vy - 330, s), lerp(BH, vy + 200, s)
+                    return (x, lerp(yt, yb, f))
+                col = rnd.choice([(230, 60, 70), (250, 200, 60), (60, 160, 240), (90, 210, 120), (240, 120, 40),
+                                  (200, 80, 200), (240, 240, 240), (40, 40, 60)])
+                col = tuple(int(c * 0.55) for c in col)
+                d.polygon([pt(s0, f0), pt(s1, f0), pt(s1, f0 + 0.09), pt(s0, f0 + 0.09)], fill=col)
+                d.line([pt(s0, f0 + 0.095), pt(s1, f0 + 0.095)], fill=(70, 70, 80), width=4)
+    fridge = (150, 210, 255) if not cool else (120, 180, 255)
+    def lights(dd):
+        dd.rectangle((vx - 230, vy - 300, vx + 230, vy + 170), fill=fridge + (150,))
+        dd.rounded_rectangle((250, 330, 940, 470), radius=40, outline=(255, 60, 150, 255), width=18)
+    img.alpha_composite(glow_layer(lights, 45))
+    d = ImageDraw.Draw(img)
+    for k in range(4):
+        x = vx - 230 + k * 115
+        d.rectangle((x + 6, vy - 300, x + 109, vy + 170), fill=tuple(int(c * 0.7) for c in fridge))
+        d.line((x + 95, vy - 120, x + 95, vy - 40), fill=(220, 230, 240), width=6)
+    neon = Image.new("RGBA", (BW, BH), (0, 0, 0, 0))
+    nd = ImageDraw.Draw(neon)
+    nd.rounded_rectangle((250, 330, 940, 470), radius=40, outline=(255, 120, 190, 255), width=8)
+    f = F("Inter-Black.otf", 96)
+    nd.text((BW / 2 - f.getlength("SPÄTI 24/7") / 2, 345), "SPÄTI 24/7", font=f, fill=(255, 150, 210, 255))
+    img.alpha_composite(neon.filter(ImageFilter.GaussianBlur(16)))
+    img.alpha_composite(neon.filter(ImageFilter.GaussianBlur(3)))
+    d = ImageDraw.Draw(img)
+    d.rectangle((0, 1560, BW, BH), fill=(34, 26, 30))
+    d.rectangle((0, 1540, BW, 1575), fill=(70, 56, 60))
+    d.rectangle((760, 1380, 1060, 1545), fill=(24, 22, 28))
+    d.rectangle((780, 1400, 1040, 1480), fill=(40, 120, 110))
+    img = img.filter(ImageFilter.GaussianBlur(5))
+    img.alpha_composite(Image.new("RGBA", (BW, BH), (8, 4, 20, 60)))
+    return img
+
+
+def bg_counter():
+    """Nahaufnahme Kassentresen: Milch, Kinderkekse, Fiebersaft im Neonlicht."""
+    img = gradient((30, 18, 40), (14, 10, 20))
+    d = ImageDraw.Draw(img)
+    def back(dd):
+        for k in range(16):
+            x = k * 80
+            dd.rectangle((x, 300, x + 60, 1100), fill=random.Random(k).choice(
+                [(140, 40, 60), (40, 90, 150), (150, 120, 40), (60, 130, 80)]) + (160,))
+        dd.ellipse((-200, 200, 500, 900), fill=(255, 60, 150, 120))
+        dd.ellipse((700, 300, 1400, 1000), fill=(80, 160, 255, 110))
+    img.alpha_composite(glow_layer(back, 50))
+    d.rectangle((0, 1240, BW, BH), fill=(40, 32, 38))
+    refl = glow_layer(lambda dd: (dd.ellipse((-100, 1300, 500, 1700), fill=(255, 60, 150, 70)),
+                                  dd.ellipse((700, 1250, 1300, 1650), fill=(80, 160, 255, 60))), 60)
+    img.alpha_composite(refl)
+    d = ImageDraw.Draw(img)
+    d.rectangle((0, 1225, BW, 1250), fill=(90, 72, 80))
+    # Milch
+    mx = 230
+    d.rectangle((mx - 110, 1270, mx + 110, 1640), fill=(235, 238, 242))
+    d.polygon([(mx - 110, 1270), (mx + 110, 1270), (mx + 60, 1200), (mx - 60, 1200)], fill=(215, 220, 228))
+    d.rectangle((mx - 110, 1440, mx + 110, 1520), fill=(60, 120, 210))
+    # Kinderkekse
+    kx = 590
+    d.rectangle((kx - 170, 1380, kx + 170, 1640), fill=(230, 120, 40))
+    for i in range(3):
+        cx = kx - 100 + i * 100
+        d.ellipse((cx - 38, 1460, cx + 38, 1536), fill=(170, 100, 40), outline=(250, 210, 120), width=6)
+    d.rectangle((kx - 170, 1390, kx + 170, 1430), fill=(250, 220, 70))
+    # Fiebersaft
+    fx = 930
+    d.rounded_rectangle((fx - 70, 1410, fx + 70, 1640), radius=22, fill=(150, 80, 30))
+    d.rectangle((fx - 30, 1350, fx + 30, 1412), fill=(245, 245, 245))
+    d.rectangle((fx - 70, 1480, fx + 70, 1570), fill=(240, 240, 235))
+    d.line((fx - 45, 1510, fx + 45, 1510), fill=(220, 60, 60), width=8)
+    d.line((fx - 45, 1540, fx + 25, 1540), fill=(120, 120, 120), width=6)
+    img = img.filter(ImageFilter.GaussianBlur(2.5))
+    return img
+
+
 BACKGROUNDS = {
     "rain": bg_rain, "hallway": bg_hallway, "door": bg_door, "classroom": bg_classroom,
     "classroom_cool": lambda: bg_classroom(cool=True), "yard": bg_yard,
     "black": bg_black, "black_red": lambda: bg_black(red=True),
+    "spaeti": bg_spaeti, "spaeti_cool": lambda: bg_spaeti(cool=True), "counter": bg_counter,
 }
 
 
@@ -397,12 +488,7 @@ class Chat:
             self.bubbles.append((b, y))
             y += b.height + 30
         self.typing = self.bubble_typing()
-        self.end_block = render_block([(f"Teil {TEIL + 1} folgt…", F("Inter-ExtraBold.otf", 88), WHITE, 0)])
-        self.cta_text = render_block([("Folge dem Kanal,", F("Inter-ExtraBold.otf", 58), WHITE, 0),
-                                      (f"damit du Teil {TEIL + 1} nicht verpasst 💗", F("Inter-Bold.otf", 46),
-                                       (225, 225, 235), 6)])
-        self.cta_button = cta_button()
-        self.pointer = emoji_img("👆", 96)
+        self.endcard = EndCard(end_overlay_t)
 
     def bubble(self, who, text):
         own = who == "Du"
@@ -455,6 +541,140 @@ class Chat:
                 cx = 45 + 30 + k * 30
                 d.ellipse((cx - 9, 43 - 9 + typing_y + off, cx + 9, 43 + 9 + typing_y + off), fill=(150, 165, 175))
         d.text((264, 252), sub, font=F("Inter-Regular.otf", 30), fill=sub_c)
+        return self.endcard.apply(img, t)
+
+# ---------------------------------------------------------------- Insta-Szene (geheimer Account)
+class Insta:
+    """Dark-Mode-Post eines Accounts. Ein Like trifft als Push-Banner ein, dann kommt die Reaktion als Text."""
+
+    def __init__(self, sc):
+        self.sc = sc
+        self.endcard = EndCard(sc["end_t"])
+        user, clock = sc["user"], sc.get("clock", "01:12")
+        base = Image.new("RGBA", (W, H), (0, 0, 0, 255))
+        d = ImageDraw.Draw(base)
+        d.text((60, 62), clock, font=F("Inter-SemiBold.otf", 34), fill=(235, 235, 235))
+        d.rounded_rectangle((930, 70, 1000, 100), radius=8, outline=(235, 235, 235), width=3)
+        d.rectangle((936, 76, 960, 94), fill=(235, 235, 235))
+        d.line((60, 235, 90, 205), fill=WHITE, width=6)
+        d.line((60, 235, 90, 265), fill=WHITE, width=6)
+        hf = F("Inter-Bold.otf", 44)
+        d.text(((W - hf.getlength("Beiträge")) / 2, 205), "Beiträge", font=hf, fill=WHITE)
+        ring = Image.new("RGBA", (120, 120), (0, 0, 0, 0))
+        rd = ImageDraw.Draw(ring)
+        for r in range(60, 0, -1):
+            k = r / 60
+            rd.ellipse((60 - r, 60 - r, 60 + r, 60 + r), fill=(int(255 * k + 120 * (1 - k)), int(60 + 40 * k), int(200 - 60 * k)))
+        rd.ellipse((8, 8, 112, 112), fill=(0, 0, 0))
+        rd.ellipse((14, 14, 106, 106), fill=(28, 24, 48))
+        ring.alpha_composite(emoji_img("🌙", 54), (33, 33))
+        base.alpha_composite(ring, (40, 320))
+        d.text((182, 352), user, font=F("Inter-Bold.otf", 38), fill=WHITE)
+        for k in range(3):
+            d.ellipse((1000 + k * 0, 350 + k * 18, 1010, 360 + k * 18), fill=WHITE)
+        # Beitragsbild: Gedicht auf Nachthimmel
+        post = gradient((14, 14, 40), (52, 22, 70), (W, W)).convert("RGBA")
+        pd = ImageDraw.Draw(post)
+        rnd = random.Random(4)
+        for _ in range(120):
+            x, y, r = rnd.randint(0, W), rnd.randint(0, W), rnd.uniform(1, 3.2)
+            pd.ellipse((x - r, y - r, x + r, y + r), fill=(255, 255, 255, rnd.randint(60, 200)))
+        post.alpha_composite(glow_layer(lambda dd: dd.ellipse((700, 90, 960, 350), fill=(255, 230, 200, 120)), 50, (W, W)))
+        pd.ellipse((760, 150, 900, 290), fill=(250, 240, 225))
+        pd.ellipse((800, 130, 940, 270), fill=(40, 22, 58))
+        self.post_top = 450
+        base.alpha_composite(post, (0, self.post_top))
+        self.poem = [render_block([(ln, F("Inter-LightItalic.otf", 66), (245, 240, 255), 0)], gap=1.0)
+                     for ln in sc["poem"]]
+        sig = F("Inter-Italic.otf", 34)
+        self.sig = Image.new("RGBA", (W, 60), (0, 0, 0, 0))
+        ImageDraw.Draw(self.sig).text((W - 140, 10), "— m.", font=sig, fill=(200, 190, 230))
+        ay = self.post_top + W + 30
+        hx = 40
+        for i, e in enumerate(("🤍", "💬", "📩")):
+            base.alpha_composite(emoji_img(e, 64), (hx + i * 100, ay))
+        base.alpha_composite(emoji_img("🔖", 60), (W - 100, ay))
+        self.likes_y = ay + 100
+        cf = F("Inter-Regular.otf", 36)
+        d.text((40, self.likes_y + 60), user, font=F("Inter-Bold.otf", 36), fill=WHITE)
+        d.text((60 + F("Inter-Bold.otf", 36).getlength(user), self.likes_y + 60), sc.get("caption", ""), font=cf, fill=(235, 235, 235))
+        d.text((40, self.likes_y + 115), "vor 3 Minuten", font=F("Inter-Regular.otf", 30), fill=(140, 140, 140))
+        self.base = base
+        self.banner = self._banner(sc["like_from"])
+        self.react = render_block([(t, F("Inter-ExtraBold.otf", s_), c, sp) for t, s_, c, sp in sc["react"]])
+
+    def _banner(self, who):
+        bw, bh = W - 60, 170
+        im = Image.new("RGBA", (bw + 40, bh + 40), (0, 0, 0, 0))
+        sh = Image.new("RGBA", im.size, (0, 0, 0, 0))
+        ImageDraw.Draw(sh).rounded_rectangle((20, 26, 20 + bw, 26 + bh), radius=40, fill=(0, 0, 0, 200))
+        im.alpha_composite(sh.filter(ImageFilter.GaussianBlur(14)))
+        d = ImageDraw.Draw(im)
+        d.rounded_rectangle((20, 20, 20 + bw, 20 + bh), radius=40, fill=(48, 48, 54, 250))
+        icon = Image.new("RGBA", (96, 96), (0, 0, 0, 0))
+        idr = ImageDraw.Draw(icon)
+        for y in range(96):
+            k = y / 95
+            idr.line((0, y, 95, y), fill=(int(130 + 120 * k), int(50 + 20 * (1 - k)), int(220 - 120 * k)))
+        mask = Image.new("L", (96, 96), 0)
+        ImageDraw.Draw(mask).rounded_rectangle((0, 0, 95, 95), radius=24, fill=255)
+        icon.putalpha(mask)
+        idr = ImageDraw.Draw(icon)
+        idr.rounded_rectangle((20, 20, 76, 76), radius=16, outline=WHITE, width=6)
+        idr.ellipse((35, 35, 61, 61), outline=WHITE, width=6)
+        im.alpha_composite(icon, (52, 57))
+        d.text((175, 52), "INSTA", font=F("Inter-SemiBold.otf", 28), fill=(170, 170, 178))
+        d.text((bw - 70, 52), "jetzt", font=F("Inter-Regular.otf", 28), fill=(170, 170, 178))
+        draw_rich(im, (175, 94), f"{who} gefällt dein Beitrag. 🤍", F("Inter-SemiBold.otf", 40), WHITE)
+        return im
+
+    def frame(self, t):
+        sc = self.sc
+        img = self.base.copy()
+        n = len(self.poem)
+        total = sum(b.height for b in self.poem)
+        y = self.post_top + W / 2 - total / 2 - 20
+        for i, b in enumerate(self.poem):
+            t0 = 0.3 + i * 0.7
+            if t >= t0:
+                e = 1 - (1 - min(1, (t - t0) / 0.6)) ** 3
+                img.alpha_composite(_fade(b, e), (0, int(y + (1 - e) * 20)))
+            y += b.height
+        if t >= 0.3 + n * 0.7:
+            img.alpha_composite(_fade(self.sig, min(1, (t - 0.3 - n * 0.7) / 0.5)), (0, self.post_top + W - 90))
+        liked = t >= sc["like_t"]
+        lf = F("Inter-Bold.otf", 36)
+        label = f"Gefällt {1 if liked else 0} Mal"
+        if liked and t - sc["like_t"] < 0.4:
+            k = 1 + 0.35 * math.sin((t - sc["like_t"]) / 0.4 * math.pi)
+            lf = F("Inter-Bold.otf", int(36 * k))
+        ImageDraw.Draw(img).text((40, self.likes_y), label, font=lf, fill=(255, 92, 122) if liked else WHITE)
+        if liked:
+            p = min(1, (t - sc["like_t"]) / 0.35)
+            e = 1 - (1 - p) ** 3
+            img.alpha_composite(self.banner, (10, int(-200 + e * 500)))
+        if t >= sc["react_t"]:
+            p = min(1, (t - sc["react_t"]) / 0.45)
+            e = 1 - (1 - p) ** 3
+            img = img.filter(ImageFilter.GaussianBlur(10 * e))
+            img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(170 * e))))
+            img.alpha_composite(self.banner, (10, 300))
+            img.alpha_composite(_fade(self.react, e), (0, int(1000 - self.react.height / 2 + (1 - e) * 36)))
+        return self.endcard.apply(img, t)
+
+
+# ---------------------------------------------------------------- Ende + CTA (für jede Folge gleich)
+class EndCard:
+    def __init__(self, end_t):
+        self.end_t = end_t
+        self.end_block = render_block([(f"Teil {TEIL + 1} folgt…", F("Inter-ExtraBold.otf", 88), WHITE, 0)])
+        self.cta_text = render_block([("Folge dem Kanal,", F("Inter-ExtraBold.otf", 58), WHITE, 0),
+                                      (f"damit du Teil {TEIL + 1} nicht verpasst 💗", F("Inter-Bold.otf", 46),
+                                       (225, 225, 235), 6)])
+        self.cta_button = cta_button()
+        self.pointer = emoji_img("👆", 96)
+
+    def apply(self, img, t):
         if t >= self.end_t:
             p = min(1, (t - self.end_t) / 0.6)
             img = img.filter(ImageFilter.GaussianBlur(14 * p))
@@ -546,6 +766,8 @@ def render_scene(idx):
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     if sc.get("chat"):
         chat = Chat(sc["msgs"], sc["end_t"], sc["dur"])
+    elif sc.get("insta"):
+        chat = Insta(sc)
     else:
         bg = BACKGROUNDS[sc["bg"]]()
         bg.alpha_composite(vignette())
@@ -559,7 +781,7 @@ def render_scene(idx):
             y += im.height + 10
     for f in range(n):
         t = f / FPS
-        if sc.get("chat"):
+        if sc.get("chat") or sc.get("insta"):
             frame = chat.frame(t).convert("RGB")
         else:
             p = t / sc["dur"]
@@ -602,7 +824,7 @@ def render_scene(idx):
 #   heartbeat=(<sek>, <n>)  Herzschlag, n Schläge
 # Automatisch: leiser Whoosh bei jedem Szenenwechsel, Nachrichtenton bei Chat-Nachrichten.
 SR = 44100
-AMB_DEFAULT = {"rain": "rain", "hallway": "room", "door": "room", "classroom": "room",
+AMB_DEFAULT = {"spaeti": "room", "spaeti_cool": "room", "counter": "room", "rain": "rain", "hallway": "room", "door": "room", "classroom": "room",
                "classroom_cool": "room", "yard": "outdoor", "black": "silence", "black_red": "silence"}
 
 
@@ -690,7 +912,7 @@ def make_audio(path, scenes):
             out[i0:i0 + L] += sig[:L] * gain
 
     for i, sc in enumerate(scenes):
-        kind = sc.get("amb") or ("phone" if sc.get("chat") else AMB_DEFAULT.get(sc.get("bg"), "room"))
+        kind = sc.get("amb") or ("phone" if sc.get("chat") or sc.get("insta") else AMB_DEFAULT.get(sc.get("bg"), "room"))
         i0 = max(0, int(starts[i] * SR) - xf // 2)
         i1 = min(n, int((starts[i] + sc["dur"]) * SR) + xf // 2)
         L = i1 - i0
@@ -710,7 +932,9 @@ def make_audio(path, scenes):
                 add(_heartbeat(), starts[i] + t0 + j * 0.85)
         for m in sc.get("msgs", []):
             add(_pling(), starts[i] + m["t"])
-        if sc.get("chat"):
+        for pt in sc.get("plings", []):
+            add(_pling(), starts[i] + pt)
+        if sc.get("end_t") is not None:
             add(_pop(rng), starts[i] + sc["end_t"] + CTA_DELAY)
     t = np.arange(n) / SR
     out *= np.clip((total - t) / 1.2, 0, 1)
