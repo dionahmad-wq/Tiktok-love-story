@@ -122,6 +122,10 @@ NOAH_C = (140, 200, 255)
 LINA_C = (255, 255, 255)
 TEACH_C = (255, 214, 150)
 PINK = (255, 92, 122)
+LUCA_C = (255, 120, 110)
+EMRE_C = (120, 220, 160)
+JASSI_C = (255, 150, 210)
+SELIN_C = (255, 200, 90)
 
 
 def narr(text, size=66, color=WHITE, font="Inter-Bold.otf"):
@@ -406,11 +410,78 @@ def bg_counter():
     return img
 
 
+def bg_lockerroom(cool=False, phone=False):
+    """Jungs-Umkleide: Metallspinde frontal, Bank, kaltes Neonröhrenlicht."""
+    img = gradient((40, 50, 48), (16, 20, 22)) if not cool else gradient((24, 34, 52), (8, 12, 22))
+    d = ImageDraw.Draw(img)
+    d.rectangle((0, 1500, BW, BH), fill=(44, 46, 50) if not cool else (26, 30, 40))
+    lc = (70, 96, 90) if not cool else (52, 70, 100)
+    for i in range(8):
+        x0 = 20 + i * 145
+        d.rectangle((x0, 420, x0 + 135, 1500), fill=lc)
+        d.rectangle((x0 + 8, 430, x0 + 127, 1490), outline=tuple(int(c * 0.7) for c in lc), width=5)
+        for k in range(5):
+            d.line((x0 + 30, 480 + k * 22, x0 + 105, 480 + k * 22), fill=tuple(int(c * 0.55) for c in lc), width=6)
+        d.rectangle((x0 + 100, 900, x0 + 112, 990), fill=(170, 175, 180))
+    d.rectangle((0, 400, BW, 425), fill=(30, 34, 36))
+    d.rectangle((60, 1600, BW - 60, 1660), fill=(110, 80, 55))
+    d.rectangle((120, 1660, 150, 1800), fill=(50, 50, 55))
+    d.rectangle((BW - 150, 1660, BW - 120, 1800), fill=(50, 50, 55))
+    d.rounded_rectangle((300, 1560, 560, 1610), radius=20, fill=(180, 40, 50))  # Sporttasche
+    tube = (200, 255, 230) if not cool else (190, 215, 255)
+    def lights(dd):
+        dd.rectangle((200, 140, 980, 175), fill=tube + (255,))
+        dd.polygon([(200, 175), (980, 175), (BW + 200, 1500), (-200, 1500)], fill=tube + (26,))
+    img.alpha_composite(glow_layer(lights, 40))
+    img.alpha_composite(glow_layer(lambda dd: dd.rectangle((200, 140, 980, 175), fill=tube + (255,)), 3))
+    if phone:
+        # Handy-Licht in der Ecke hinter dem letzten Spind, mit rotem Aufnahmepunkt
+        img.alpha_composite(Image.new("RGBA", (BW, BH), (0, 0, 0, 120)))
+        img.alpha_composite(glow_layer(lambda dd: dd.ellipse((900, 900, 1250, 1300), fill=(200, 220, 255, 170)), 60))
+        d = ImageDraw.Draw(img)
+        d.rounded_rectangle((1060, 1000, 1150, 1170), radius=16, fill=(225, 235, 255))
+        d.ellipse((1085, 1020, 1105, 1040), fill=(255, 40, 50))
+    return img.filter(ImageFilter.GaussianBlur(5))
+
+
+def bg_note():
+    """Linas Tisch von oben, darauf ein gefalteter Zettel von Noah."""
+    img = gradient((92, 62, 42), (60, 40, 28))
+    d = ImageDraw.Draw(img)
+    rnd = random.Random(8)
+    for _ in range(60):
+        y = rnd.randint(0, BH)
+        d.line((0, y, BW, y + rnd.randint(-30, 30)), fill=(70, 46, 30, 255), width=rnd.randint(2, 6))
+    img = img.filter(ImageFilter.GaussianBlur(2))
+    img.alpha_composite(glow_layer(lambda dd: dd.ellipse((-300, -200, 900, 900), fill=(255, 230, 190, 70)), 120))
+    note = Image.new("RGBA", (760, 520), (0, 0, 0, 0))
+    nd = ImageDraw.Draw(note)
+    nd.rectangle((0, 0, 759, 519), fill=(250, 248, 238))
+    for k in range(7):
+        nd.line((0, 90 + k * 62, 760, 90 + k * 62), fill=(170, 200, 235), width=3)
+    nd.line((90, 0, 90, 520), fill=(240, 150, 150), width=3)
+    nd.text((130, 150), "Lust auf Kino", font=F("InterDisplay-BoldItalic.otf", 74), fill=(30, 40, 110))
+    nd.text((130, 260), "Freitag?", font=F("InterDisplay-BoldItalic.otf", 74), fill=(30, 40, 110))
+    nd.text((470, 380), "– N.", font=F("InterDisplay-BoldItalic.otf", 70), fill=(30, 40, 110))
+    note = note.rotate(-6, expand=True, resample=Image.BICUBIC)
+    sh = Image.new("RGBA", note.size, (0, 0, 0, 0))
+    sh.putalpha(note.getchannel("A").point(lambda v: int(v * 0.6)))
+    sh = sh.filter(ImageFilter.GaussianBlur(18))
+    x, y = (BW - note.width) // 2, 1180
+    img.alpha_composite(sh, (x + 14, y + 24))
+    img.alpha_composite(note, (x, y))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle((80, 1850, 900, 1890), radius=18, fill=(40, 90, 200))  # Stift
+    return img
+
+
 BACKGROUNDS = {
     "rain": bg_rain, "hallway": bg_hallway, "door": bg_door, "classroom": bg_classroom,
     "classroom_cool": lambda: bg_classroom(cool=True), "yard": bg_yard,
     "black": bg_black, "black_red": lambda: bg_black(red=True),
     "spaeti": bg_spaeti, "spaeti_cool": lambda: bg_spaeti(cool=True), "counter": bg_counter,
+    "lockerroom": bg_lockerroom, "lockerroom_cool": lambda: bg_lockerroom(cool=True),
+    "lockerroom_phone": lambda: bg_lockerroom(cool=True, phone=True), "note": bg_note,
 }
 
 
@@ -450,8 +521,11 @@ class Chat:
     IN_C, OUT_C = (32, 44, 51), (0, 92, 75)
     NAME_C = {"Luca": (255, 120, 110), "Emre": (120, 220, 160)}
 
-    def __init__(self, msgs, end_overlay_t, dur):
+    def __init__(self, msgs, end_overlay_t, dur, title="Die Jungs 🐐", subtitle="Luca, Emre, Du", avatar="🐐",
+                 group=True, clock="22:14", react=None, react_t=None):
         self.msgs, self.end_t, self.dur = msgs, end_overlay_t, dur
+        self.subtitle, self.group, self.clock, self.react_t = subtitle, group, clock, react_t
+        self.react = render_block([(t, F("Inter-ExtraBold.otf", s_), c, sp) for t, s_, c, sp in react]) if react else None
         base = Image.new("RGBA", (W, H), self.BG + (255,))
         pat = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         dp = ImageDraw.Draw(pat)
@@ -462,14 +536,14 @@ class Chat:
         base.alpha_composite(pat)
         d = ImageDraw.Draw(base)
         d.rectangle((0, 0, W, 330), fill=self.HEAD)
-        d.text((60, 62), "22:14", font=F("Inter-SemiBold.otf", 34), fill=(230, 235, 238))
+        d.text((60, 62), clock, font=F("Inter-SemiBold.otf", 34), fill=(230, 235, 238))
         d.rounded_rectangle((930, 70, 1000, 100), radius=8, outline=(230, 235, 238), width=3)
         d.rectangle((936, 76, 980, 94), fill=(230, 235, 238))
         d.line((70, 245, 100, 215), fill=(230, 235, 238), width=6)
         d.line((70, 245, 100, 275), fill=(230, 235, 238), width=6)
         d.ellipse((125, 190, 235, 300), fill=(70, 84, 94))
-        base.alpha_composite(emoji_img("🐐", 64), (148, 212))
-        draw_rich(base, (262, 192), "Die Jungs 🐐", F("Inter-SemiBold.otf", 46), (233, 237, 239))
+        base.alpha_composite(emoji_img(avatar, 64), (148, 212))
+        draw_rich(base, (262, 192), title, F("Inter-SemiBold.otf", 46), (233, 237, 239))
         for k in range(3):
             d.ellipse((1010, 215 + k * 22, 1020, 225 + k * 22), fill=(200, 210, 215))
         fchip = F("Inter-SemiBold.otf", 28)
@@ -495,17 +569,17 @@ class Chat:
         fn, ft, fm = F("Inter-SemiBold.otf", 36), F("Inter-Regular.otf", 52), F("Inter-Regular.otf", 26)
         lines = wrap(text, ft, 760)
         tw = max(text_w(l, ft) for l in lines)
-        nh = 0 if own else 50
+        nh = 0 if own or not self.group else 50
         bw = int(max(tw + 120, 0 if own else fn.getlength(who)) + 52)
         bh = int(nh + len(lines) * 64 + 62)
         im = Image.new("RGBA", (bw, bh), (0, 0, 0, 0))
         d = ImageDraw.Draw(im)
         d.rounded_rectangle((0, 0, bw - 1, bh - 1), radius=26, fill=(self.OUT_C if own else self.IN_C) + (255,))
-        if not own:
+        if not own and self.group:
             d.text((26, 16), who, font=fn, fill=self.NAME_C.get(who, (200, 200, 200)))
         for i, l in enumerate(lines):
             draw_rich(im, (26, 18 + nh + i * 64), l, ft, (233, 237, 239))
-        d.text((bw - (130 if own else 96), bh - 42), "22:14", font=fm, fill=(170, 190, 185) if own else (140, 155, 165))
+        d.text((bw - (130 if own else 96), bh - 42), self.clock, font=fm, fill=(170, 190, 185) if own else (140, 155, 165))
         if own:
             for dx in (0, 14):
                 d.line((bw - 30 + dx - 14, bh - 26, bw - 30 + dx - 8, bh - 20), fill=(83, 189, 235), width=3)
@@ -531,17 +605,29 @@ class Chat:
                 x = W - b.width - 30 if b._own else 30
                 bb = b if p >= 1 else _fade(b, e)
                 img.alpha_composite(bb, (int(x), int(y + (1 - e) * 30)))
-        sub = "Luca, Emre, Du"
+        sub = self.subtitle
         sub_c = (140, 155, 165)
         if typing_who:
-            sub, sub_c = f"{typing_who} schreibt…", (0, 200, 150)
+            sub, sub_c = (f"{typing_who} schreibt…" if self.group else "schreibt…"), (0, 200, 150)
             img.alpha_composite(self.typing, (30, typing_y))
             for k in range(3):
                 off = math.sin(t * 9 - k * 0.9) * 7
                 cx = 45 + 30 + k * 30
                 d.ellipse((cx - 9, 43 - 9 + typing_y + off, cx + 9, 43 + 9 + typing_y + off), fill=(150, 165, 175))
         d.text((264, 252), sub, font=F("Inter-Regular.otf", 30), fill=sub_c)
+        if self.react is not None and t >= self.react_t:
+            img = react_overlay(img, t - self.react_t, self.react)
         return self.endcard.apply(img, t)
+
+
+def react_overlay(img, dt, block, y=1000):
+    """Reaktion auf dem Handy-Screen: Hintergrund unscharf + dunkel, großer Text."""
+    e = 1 - (1 - min(1, dt / 0.45)) ** 3
+    img = img.filter(ImageFilter.GaussianBlur(10 * e))
+    img.alpha_composite(Image.new("RGBA", (W, H), (0, 0, 0, int(170 * e))))
+    img.alpha_composite(_fade(block, e), (0, int(y - block.height / 2 + (1 - e) * 36)))
+    return img
+
 
 # ---------------------------------------------------------------- Insta-Szene (geheimer Account)
 class Insta:
@@ -765,7 +851,7 @@ def render_scene(idx):
            "-pix_fmt", "yuv420p", path]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     if sc.get("chat"):
-        chat = Chat(sc["msgs"], sc["end_t"], sc["dur"])
+        chat = Chat(sc["msgs"], sc["end_t"], sc["dur"], **sc.get("chat_opts", {}))
     elif sc.get("insta"):
         chat = Insta(sc)
     else:
@@ -824,7 +910,7 @@ def render_scene(idx):
 #   heartbeat=(<sek>, <n>)  Herzschlag, n Schläge
 # Automatisch: leiser Whoosh bei jedem Szenenwechsel, Nachrichtenton bei Chat-Nachrichten.
 SR = 44100
-AMB_DEFAULT = {"spaeti": "room", "spaeti_cool": "room", "counter": "room", "rain": "rain", "hallway": "room", "door": "room", "classroom": "room",
+AMB_DEFAULT = {"lockerroom": "room", "lockerroom_cool": "room", "lockerroom_phone": "night", "note": "room", "spaeti": "room", "spaeti_cool": "room", "counter": "room", "rain": "rain", "hallway": "room", "door": "room", "classroom": "room",
                "classroom_cool": "room", "yard": "outdoor", "black": "silence", "black_red": "silence"}
 
 

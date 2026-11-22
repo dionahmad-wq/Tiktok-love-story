@@ -13,14 +13,14 @@ Folge 1 ist die Referenz. **Jede neue Folge sieht und klingt genau so.**
 3. **Dramamoment:** kurzer Satz auf Schwarz mit rotem Glühen, dazu Bass-Schlag und Herzschlag
 4. **Überleitung:** „Am selben Abend.“ / „<Name>s Handy.“ auf Schwarz
 5. **Cliffhanger auf einem Handy-Screen**, entweder
-   - als **Chat** (WhatsApp-Dark-Mode) mit „schreibt…“-Anzeige und Nachrichtenton (`chat=True`), oder
+   - als **Chat** (WhatsApp-Dark-Mode) mit „schreibt…“-Anzeige und Nachrichtenton (`chat=True`). Über `chat_opts` lassen sich Gruppen- oder Einzelchat (`group=False`), Titel, Avatar und Uhrzeit einstellen, außerdem eine Reaktion mit großem Text am Ende (`react`, `react_t`). Oder
    - als **Insta-Post** von @mitternachtsgedanken: Das Gedicht erscheint Zeile für Zeile, ein Like kommt als Push-Banner rein, danach die Reaktion als großer Text (`insta=True`)
 6. **Ende mit CTA (immer!):** Der Chat wird unscharf und dunkel, dann erscheint „Teil X+1 folgt…“. 0,8 s später kommt **„Folge dem Kanal, damit du Teil X+1 nicht verpasst 💗“** mit einem pinken, pulsierenden **„+ Folgen“-Button** (Plopp-Geräusch) und einem tippenden 👆. Die CTA steht mindestens 3 Sekunden. Das macht die Engine automatisch, die letzte Szene (Chat oder Insta) muss nur `dur ≈ end_t + 4.2` haben.
 
 ## 3. Optik
 | Element | Regel |
 |---|---|
-| Hintergründe | gezeichnet und stimmungsvoll: `rain`, `hallway`, `door`, `classroom`, `classroom_cool`, `yard`, `spaeti`, `spaeti_cool`, `counter`, `black`, `black_red` |
+| Hintergründe | gezeichnet und stimmungsvoll: `rain`, `hallway`, `door`, `classroom`, `classroom_cool`, `yard`, `spaeti`, `spaeti_cool`, `counter`, `lockerroom`, `lockerroom_cool`, `lockerroom_phone`, `note`, `black`, `black_red` |
 | Bewegung | langsamer Zoom (7 % pro Szene), Partikel (`rain`, `dust`, `dust_cool`) und Filmkorn |
 | Look | Vignette, dunkle Farbtöne, leichte Unschärfe im Hintergrund |
 | Badge | oben mittig „● 30 TAGE · TEIL X“, außer auf Überleitungen und im Chat |
@@ -38,6 +38,9 @@ Folge 1 ist die Referenz. **Jede neue Folge sieht und klingt genau so.**
 | Pointe/Schock | Pink `(255, 92, 122)` |
 | Chat: Luca | Rot `(255, 120, 110)` |
 | Chat: Emre | Grün `(120, 220, 160)` |
+| **Luca** (auch in Dialogen) | Rot `(255, 120, 110)` |
+| **Jassi** | Rosa `(255, 150, 210)` |
+| **Selin** | Gelb `(255, 200, 90)` |
 
 Dialoge stehen immer so: **NAME** (klein, Großbuchstaben), darunter das Zitat in deutschen Anführungszeichen „…“.
 
